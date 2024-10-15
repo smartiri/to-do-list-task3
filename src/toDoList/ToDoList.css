@@ -1,0 +1,45 @@
+input[type="checkbox"] {
+  /* ...existing styles */
+  display: grid;
+  place-content: center;
+  width: 2em;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 120ms transform ease-in-out;
+  box-shadow: inset 1em 1em var(--form-control-color);
+}
+
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.edit,
+.delete {
+  background-color: crimson;
+  padding: 3%;
+  border-radius: 11px;
+}
+
+.delete {
+  background-color: crimson;
+}
+
+.edit {
+  background-color: green;
+}
+
+.table-order {
+  display: "flex";
+  flex-direction: "column";
+  gap: 2%;
+  padding-top: 3%;
+}
+
+.table-order > div {
+  flex-direction: "row";
+}
