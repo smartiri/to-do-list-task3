@@ -1,40 +1,58 @@
 import React, { useState } from "react";
 import "../toDoCard/ToDoCard.css";
 import ToDoList from "../toDoList/ToDoList";
+import useTodoApi from "../toDoList/service";
 
-let nextId = 1;
 export default function ToDoCard() {
-  const [todos, setTodos] = useState([]);
-  const [newTask, setNewTask] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [currentTodo, setCurrentTodo] = useState(null);
-  const handleClick = () => {
-    if (!newTask.trim()) return;
-
-    setTodos([...todos, { id: nextId++, title: newTask }]);
-    setNewTask("");
+  const { todos, addTodo, toggleComplete, editTodo, deleteTodo } = useTodoApi();
+  const [id, setId] = useState(null);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [view, setView] = useState(0);
+  const [filterTodo, setFilterTodo] = useState(null);
+  const handleAddTask = () => {
+    const newTask = {
+      title,
+      description,
+      completed: false,
+    };
+    addTodo(newTask);
+    setTitle("");
+    setDescription("");
   };
 
-  const handleDeleteTodo = (id) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(updatedTodos);
-  };
-
-  const handleEditTodo = (todo) => {
-    setIsEditing(true);
-    setNewTask(todo.title);
-    setCurrentTodo(todo);
-  };
-
-  const handleUpdateTodo = () => {
-    if (!newTask.trim()) return;
-    const updatedTodos = todos.map((todo) =>
-      todo.id === currentTodo.id ? { ...todo, title: newTask } : todo
-    );
-    setTodos(updatedTodos);
+  const handleEditTask = () => {
+    const newTask = {
+      id,
+      title,
+      description,
+    };
+    editTodo(newTask);
     setIsEditing(false);
-    setNewTask("");
-    setCurrentTodo(null);
+    setTitle("");
+    setDescription("");
+  };
+
+  const toggleEditTodo = (todo) => {
+    setIsEditing(true);
+    setId(todo.id);
+    setTitle(todo.title);
+    setDescription(todo.description);
+  };
+
+  const handleClick = (filter) => {
+    setFilterTodo(filter);
+  };
+
+  const filteredTodos = () => {
+    if (filterTodo === "completed") {
+      return todos.filter((todo) => todo.completed);
+    }
+    if (filterTodo === "pending") {
+      return todos.filter((todo) => !todo.completed);
+    }
+    return todos;
   };
   return (
     <div className="card">
@@ -43,24 +61,48 @@ export default function ToDoCard() {
         <input
           type="text"
           className="input"
-          placeholder="enter new task"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
+          placeholder="enter title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
         />
+        <input
+          type="text"
+          className="input"
+          placeholder="enter description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+
         <button
           type="button"
-          style={{ marginLeft: "-22%" }}
-          onClick={isEditing ? handleUpdateTodo : handleClick}
+          onClick={isEditing ? handleEditTask : handleAddTask}
         >
           {isEditing ? "Update Task" : "Add Task"}
         </button>
+        <hr />
+        <div
+          style={{
+            gap: "15px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <button onClick={() => handleClick("all")}>All</button>
+          <button onClick={() => handleClick("completed")}>Completed</button>
+          <button onClick={() => handleClick("pending")}>Pending</button>
+        </div>
       </div>
-      {todos.map((todo) => (
+
+      {filteredTodos().map((todo) => (
         <ToDoList
           key={todo.id}
           toDo={todo}
-          onEdit={handleEditTodo}
-          onDelete={handleDeleteTodo}
+          view={view}
+          toggleView={() => setView(todo.id)}
+          complete={() => toggleComplete(todo)}
+          close={() => setView(0)}
+          edit={() => toggleEditTodo(todo)}
+          onDelete={() => deleteTodo(todo.id)}
         />
       ))}
     </div>

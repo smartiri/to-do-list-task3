@@ -5,22 +5,10 @@
   border-radius: 15px;
   padding: 2%;
   overflow: scroll;
-}
-
-.title,
-.body {
-  background-color: white;
-  color: #7b4397;
-  border-radius: 15px;
-  font-weight: bold;
-}
-
-.body {
-  display: flex;
-  flex-direction: column;
-  margin-top: 5%;
-  justify-content: center;
-  gap: 22px;
+  font-size: 20px;
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 20px;
 }
 
 button {
@@ -46,9 +34,9 @@ button:active {
 
 .input {
   border: 1px solid lightgrey;
-  border-radius: 7px;
+  /* border-radius: 15px; */
   background-color: white;
-  width: 96%;
+  width: 100%;
   padding: 2%;
   font-size: 15px;
 }
