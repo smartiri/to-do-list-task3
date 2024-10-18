@@ -4,14 +4,16 @@ import ToDoList from "../toDoList/ToDoList";
 import useTodoApi from "../toDoList/service";
 
 export default function ToDoCard() {
-  const [isEditing, setIsEditing] = useState(false);
   const { todos, addTodo, toggleComplete, editTodo, deleteTodo } = useTodoApi();
+  const [isEditing, setIsEditing] = useState(false);
   const [id, setId] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [view, setView] = useState(0);
   const [filterTodo, setFilterTodo] = useState(null);
-  const handleAddTask = () => {
+
+  const handleAddTask = (e) => {
+    e.preventDefault();
     if (title.trim() === "" || description.trim() === "") {
       alert("Title and description cannot be empty");
       return;
@@ -26,7 +28,8 @@ export default function ToDoCard() {
     setDescription("");
   };
 
-  const handleEditTask = () => {
+  const handleEditTask = (e) => {
+    e.preventDefault();
     const newTask = {
       id,
       title,
@@ -58,7 +61,6 @@ export default function ToDoCard() {
     }
     return todos;
   }, [todos, filterTodo]);
-  console.log("i am rendering");
   return (
     <div className="card">
       <div className="title">To Do List</div>
@@ -80,7 +82,7 @@ export default function ToDoCard() {
 
         <button
           type="button"
-          onClick={isEditing ? handleEditTask : handleAddTask}
+          onClick={(e) => (isEditing ? handleEditTask(e) : handleAddTask(e))}
         >
           {isEditing ? "Update Task" : "Add Task"}
         </button>

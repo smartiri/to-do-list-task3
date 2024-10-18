@@ -38,7 +38,7 @@ const ToDoList = React.memo(
         {view === toDo.id && (
           <div className="view_more">
             <div>
-              <span class="close" onClick={close}>
+              <span className="close" onClick={close}>
                 &times;
               </span>
               <h5 style={{ marginTop: "0.6rem", color: "#7b4397" }}>
