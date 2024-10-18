@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import "../toDoCard/ToDoCard.css";
 import ToDoList from "../toDoList/ToDoList";
 import useTodoApi from "../toDoList/service";
@@ -12,6 +12,10 @@ export default function ToDoCard() {
   const [view, setView] = useState(0);
   const [filterTodo, setFilterTodo] = useState(null);
   const handleAddTask = () => {
+    if (title.trim() === "" || description.trim() === "") {
+      alert("Title and description cannot be empty");
+      return;
+    }
     const newTask = {
       title,
       description,
@@ -45,7 +49,7 @@ export default function ToDoCard() {
     setFilterTodo(filter);
   };
 
-  const filteredTodos = () => {
+  const filteredTodos = useMemo(() => {
     if (filterTodo === "completed") {
       return todos.filter((todo) => todo.completed);
     }
@@ -53,7 +57,8 @@ export default function ToDoCard() {
       return todos.filter((todo) => !todo.completed);
     }
     return todos;
-  };
+  }, [todos, filterTodo]);
+  console.log("i am rendering");
   return (
     <div className="card">
       <div className="title">To Do List</div>
@@ -93,7 +98,7 @@ export default function ToDoCard() {
         </div>
       </div>
 
-      {filteredTodos().map((todo) => (
+      {filteredTodos.map((todo) => (
         <ToDoList
           key={todo.id}
           toDo={todo}
