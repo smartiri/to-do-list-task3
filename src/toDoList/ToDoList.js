@@ -1,7 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import "../toDoList/ToDoList.css";
 import React from "react";
 const ToDoList = React.memo(
-  ({ toDo, edit, onDelete, view, toggleView, close, complete }) => {
+  ({ toDo, onDelete, view, toggleView, close, complete }) => {
+    const navigate = useNavigate();
+    const handleEditTask = (id) => {
+      navigate("/todo/" + id, { state: { id: id } });
+    };
     return (
       <div className="table-order">
         <div
@@ -26,7 +31,7 @@ const ToDoList = React.memo(
             View
           </button>
           {!toDo.completed && (
-            <button className="edit" onClick={edit}>
+            <button className="edit" onClick={() => handleEditTask(toDo.id)}>
               Edit
             </button>
           )}

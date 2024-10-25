@@ -1,5 +1,6 @@
 import { useReducer, useEffect } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 function reducer(state, action) {
   switch (action.type) {
@@ -32,19 +33,18 @@ function reducer(state, action) {
 
 function useTodoApi() {
   const [todos, dispatch] = useReducer(reducer, []);
-
+  const location = useLocation();
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/todos");
+      dispatch({ type: "SET_TODOS", payload: response.data });
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get("http://localhost:8080/todos");
-        dispatch({ type: "SET_TODOS", payload: response.data });
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
-
     fetchTasks();
-  }, []);
+  }, [location.pathname]);
 
   const addTodo = async (task) => {
     try {
@@ -57,7 +57,6 @@ function useTodoApi() {
 
   const editTodo = async (task) => {
     try {
-      console.log(task);
       const response = await axios.patch(
         "http://localhost:8080/todos/" + String(task.id),
         task
@@ -89,7 +88,14 @@ function useTodoApi() {
     }
   };
 
-  return { todos, addTodo, toggleComplete, editTodo, deleteTodo };
+  return {
+    todos,
+    addTodo,
+    fetchTasks,
+    toggleComplete,
+    editTodo,
+    deleteTodo,
+  };
 }
 
 export default useTodoApi;

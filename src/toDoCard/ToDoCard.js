@@ -1,92 +1,52 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import "../toDoCard/ToDoCard.css";
 import ToDoList from "../toDoList/ToDoList";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import useTodoApi from "../toDoList/service";
-
 export default function ToDoCard() {
-  const { todos, addTodo, toggleComplete, editTodo, deleteTodo } = useTodoApi();
-  const [isEditing, setIsEditing] = useState(false);
-  const [id, setId] = useState(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [view, setView] = useState(0);
-  const [filterTodo, setFilterTodo] = useState(null);
+  const navigate = useNavigate();
+  const { todos, fetchTasks, toggleComplete, deleteTodo } = useTodoApi();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryParam = searchParams.get("todo");
 
-  const handleAddTask = (e) => {
-    e.preventDefault();
-    if (title.trim() === "" || description.trim() === "") {
-      alert("Title and description cannot be empty");
-      return;
+  useEffect(() => {
+    if (location.state) {
+      fetchTasks();
     }
-    const newTask = {
-      title,
-      description,
-      completed: false,
-    };
-    addTodo(newTask);
-    setTitle("");
-    setDescription("");
-  };
-
-  const handleEditTask = (e) => {
-    e.preventDefault();
-    const newTask = {
-      id,
-      title,
-      description,
-    };
-    editTodo(newTask);
-    setIsEditing(false);
-    setTitle("");
-    setDescription("");
-  };
-
-  const toggleEditTodo = (todo) => {
-    setIsEditing(true);
-    setId(todo.id);
-    setTitle(todo.title);
-    setDescription(todo.description);
-  };
+  }, [fetchTasks]);
 
   const handleClick = (filter) => {
-    setFilterTodo(filter);
+    setSearchParams({ todo: filter });
+  };
+
+  const handleCreate = () => {
+    navigate("/todo");
   };
 
   const filteredTodos = useMemo(() => {
-    if (filterTodo === "completed") {
-      return todos.filter((todo) => todo.completed);
-    }
-    if (filterTodo === "pending") {
-      return todos.filter((todo) => !todo.completed);
+    if (queryParam) {
+      if (queryParam === "completed") {
+        return todos.filter((todo) => todo.completed);
+      }
+      if (queryParam === "pending") {
+        return todos.filter((todo) => !todo.completed);
+      }
     }
     return todos;
-  }, [todos, filterTodo]);
+  }, [todos, searchParams]);
+  // console.log("i am rendering");
   return (
     <div className="card">
       <div className="title">To Do List</div>
       <div className="body">
-        <input
-          type="text"
-          className="input"
-          placeholder="enter title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <input
-          type="text"
-          className="input"
-          placeholder="enter description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
+        <div>
+          <button style={{ float: "right" }} onClick={handleCreate}>
+            Create ToDo
+          </button>
+        </div>
 
-        <button
-          type="button"
-          onClick={(e) => (isEditing ? handleEditTask(e) : handleAddTask(e))}
-        >
-          {isEditing ? "Update Task" : "Add Task"}
-        </button>
-        <hr />
         <div
           style={{
             gap: "15px",
@@ -108,7 +68,6 @@ export default function ToDoCard() {
           toggleView={() => setView(todo.id)}
           complete={() => toggleComplete(todo)}
           close={() => setView(0)}
-          edit={() => toggleEditTodo(todo)}
           onDelete={() => deleteTodo(todo.id)}
         />
       ))}
