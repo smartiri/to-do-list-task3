@@ -61,6 +61,7 @@ export default function ToDoCard() {
     }
     return todos;
   }, [todos, filterTodo]);
+
   return (
     <div className="card">
       <div className="title">To Do List</div>
